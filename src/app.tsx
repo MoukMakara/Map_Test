@@ -1,39 +1,31 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { createRoot } from "react-dom/client";
 import {
   APIProvider,
   Map,
-  Marker,
+  AdvancedMarker,
   MapCameraChangedEvent,
+  Pin,
+  Marker,
 } from "@vis.gl/react-google-maps";
+import type { Marker } from "@googlemaps/markerclusterer";
 
-// Define Poi type with an additional label property
-type Poi = { key: string; location: google.maps.LatLngLiteral; label: string };
+// 6. Add markers to the map
+type Poi = { key: string; location: google.maps.LatLngLiteral };
 const locations: Poi[] = [
   {
     key: "T-Soccer",
     location: { lat: 11.58603815946927, lng: 104.90250606361631 },
-    label: "T-Soccer",
   },
-  {
-    key: "Sony Sport Club",
-    location: { lat: 11.5736576, lng: 104.9133056 },
-    label: "Sony Sport Club",
-  },
-  {
-    key: "Down Town Sport",
-    location: { lat: 11.551841, lng: 104.900934 },
-    label: "Down Town Sport",
-  },
+  { key: "Sony Sport Club", location: { lat: 11.5736576, lng: 104.9133056 } },
+  { key: "Down Town Sport", location: { lat: 11.551841, lng: 104.900934 } },
   {
     key: "PhanRong Sport",
     location: { lat: 11.573727628331069, lng: 104.82179080969664 },
-    label: "PhanRong Sport",
   },
   {
     key: "Happy Sports Cambodia",
     location: { lat: 11.53914874749284, lng: 104.85660960732177 },
-    label: "Happy Sports Cambodia",
   },
 ];
 
@@ -45,6 +37,7 @@ const App = () => (
     <Map
       defaultZoom={13}
       defaultCenter={{ lat: 11.578268759952971, lng: 104.90178553000196 }}
+      mapId="a2b2fd561b553426"
       onCameraChanged={(ev: MapCameraChangedEvent) =>
         console.log(
           "camera changed:",
@@ -54,6 +47,7 @@ const App = () => (
         )
       }
     >
+      {" "}
       <PoiMarkers pois={locations} />
     </Map>
   </APIProvider>
@@ -113,26 +107,30 @@ const PoiMarkers = (props: { pois: Poi[] }) => {
   return (
     <>
       {props.pois.map((poi: Poi) => (
-        <Marker
-          key={poi.key}
-          position={poi.location}
-          label={poi.label} // Add label to marker
-        />
+        <AdvancedMarker key={poi.key} position={poi.location}>
+          <Pin
+            background={"#FF0000"}
+            glyphColor={"#C70039"}
+            borderColor={"#ff5b5b"}
+          />
+        </AdvancedMarker>
       ))}
       {currentLocation && (
         <Marker
           key="current-location"
           position={currentLocation}
-          icon="http://maps.google.com/mapfiles/ms/icons/blue-dot.png" // Custom icon for the current location
-          label="You are here" // Add label to current location marker
+          icon="http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+          // label="You are here"
         />
       )}
       {currentLocation && (
         <div>
           {Object.entries(distances).map(([key, distance]) => (
-            <p key={key}>
+            <div>
+              <p key={key}>
               Distance to {key}: {(distance / 1000).toFixed(2)} km
             </p>
+            </div>
           ))}
         </div>
       )}
